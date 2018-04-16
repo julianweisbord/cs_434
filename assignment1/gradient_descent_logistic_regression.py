@@ -6,7 +6,7 @@ description:
 '''
 import csv
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 N_EPOCHS = 10
 LEARNING_RATE = .1
@@ -91,11 +91,11 @@ def main():
     # Question 1
     w, example_accuracy = gradient_descent(X, Y)
     epoch_list = [epoch for epoch in range(N_EPOCHS)]
-    if PLOT:
-        plt.plot(epoch_list, example_accuracy)
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.show()
+    # if PLOT:
+    #     plt.plot(epoch_list, example_accuracy)
+    #     plt.xlabel('Epoch')
+    #     plt.ylabel('Accuracy')
+    #     plt.show()
 
     # Question 3
     w_L2, example_accuracy_L2 = gradient_descent(X, Y, L2_Regularization=True)
