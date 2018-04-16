@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 N_EPOCHS = 10
 LEARNING_RATE = .1
 PLOT = False
-LAMBDA = 100
+LAMBDA = .00000001
 
 def load_data(filename):
     X = []
