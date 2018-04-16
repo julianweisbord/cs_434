@@ -6,12 +6,12 @@ description:
 '''
 import csv
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 N_EPOCHS = 10
 LEARNING_RATE = .1
 PLOT = False
-LAMBDA = .00001
+LAMBDA = 100
 
 def load_data(filename):
     X = []
@@ -44,7 +44,7 @@ def gradient_descent(X, Y, L2_Regularization=False):
     print("X.shape ", X.shape)
     # Random weight vector with shape equal to number of features
     w = np.zeros(feature_len)
-    k = np.zeros(feature_len)
+    l2_reg = 0
     step = 0
     correct_count = 0
     while(step < N_EPOCHS):
@@ -55,10 +55,8 @@ def gradient_descent(X, Y, L2_Regularization=False):
             # y_hat is the predicted output
             y_hat = sigmoid(w.T, X[example])
             if L2_Regularization:
-                reg = .5 * LAMBDA * np.linalg.norm(k, 2)
-                y_hat +=reg
-                # print(w)
-                print(reg)
+                l2_reg = .5 * LAMBDA * np.linalg.norm(w, 2)
+
             if y_hat >= .5:
                 y_hat = 1
             # y_hat[y_hat >= .5] = 1  # Replace all values greater than .5 with 1
@@ -67,7 +65,7 @@ def gradient_descent(X, Y, L2_Regularization=False):
             if loss[0] == 0:
                 correct_count += 1
                 print(correct_count)
-            grad += loss[0] * X[example]
+            grad += loss[0] * X[example] + l2_reg
 
 
         w += -LEARNING_RATE * grad
@@ -91,14 +89,19 @@ def main():
     # Question 1
     w, example_accuracy = gradient_descent(X, Y)
     epoch_list = [epoch for epoch in range(N_EPOCHS)]
-    # if PLOT:
-    #     plt.plot(epoch_list, example_accuracy)
-    #     plt.xlabel('Epoch')
-    #     plt.ylabel('Accuracy')
-    #     plt.show()
+    if PLOT:
+        plt.plot(epoch_list, example_accuracy)
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.show()
 
     # Question 3
-    w_L2, example_accuracy_L2 = gradient_descent(X, Y, L2_Regularization=True)
-    w_L2, example_accuracy_L2 = gradient_descent(X_test, Y_test, L2_Regularization=True)
+    w_L2_train, example_accuracy_L2_train = gradient_descent(X, Y, L2_Regularization=True)
+    w_L2_test, example_accuracy_L2_test = gradient_descent(X_test, Y_test, L2_Regularization=True)
+    print("Example accuracy no L2_Regularization: ", example_accuracy)
+    print("example_accuracy_L2_train: ", example_accuracy_L2_train)
+    print("example_accuracy_L2_test: ", example_accuracy_L2_test)
+
+
 if __name__ == "__main__":
     main()
