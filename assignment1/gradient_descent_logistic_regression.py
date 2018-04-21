@@ -1,8 +1,7 @@
 '''
 Created on April 10th, 2018
 author: Julian Weisbord
-sources:
-description:
+description: Gradient descent for logistic regression with L2 Regularization
 '''
 import csv
 import numpy as np
@@ -14,9 +13,15 @@ PLOT = False
 LAMBDA = .00000001
 
 def load_data(filename):
+    '''
+    Description: Load a csv file of data and features
+    Input: filename <String> path of input csv file
+    Return: X <numpy array> usps data with different features
+            Y <numpy array> label for each data example
+    '''
+
     X = []
     Y = []
-
     with open(filename, 'r') as csvfile:
         X = [[int(x) for x in line] for line in csv.reader(csvfile, delimiter=',')]
 
@@ -32,11 +37,26 @@ def load_data(filename):
     return X, Y
 
 def sigmoid(weight_param, x_param):
+    '''
+    Description: Apply the sigmoid function to the data.
+    Input: weight_param <numpy matrix>
+           x_param <numpy matrix>
+    Return: sig <int> The output prediction label
+    '''
+
     denom_sigmoid = np.longdouble(1 + np.exp(np.dot(-weight_param, x_param)))
     sig = np.longdouble(np.divide(1, denom_sigmoid, where=denom_sigmoid!=0.0))
     return sig
 
 def gradient_descent(X, Y, L2_Regularization=False):
+    '''
+    Description: Update the weights with gradient descent
+    Input: X <numpy matrix> usps data with different features
+           Y <numpy array> label for each data example
+           L2_Regularization <Boolean> True if using L2 Regularization
+               with logistic regression
+    Return: sig <int> The output prediction label
+    '''
     example_accuracy = []
     X = np.c_[np.ones((X.shape[0])), X]  # Add bias of 1 to each example
     feature_len = X.shape[1]
@@ -51,34 +71,28 @@ def gradient_descent(X, Y, L2_Regularization=False):
         print("Iteration: ", step)
         grad = np.zeros(feature_len, dtype=np.longdouble)
         for example in range(example_count):
-            param_accuracy = []
             # y_hat is the predicted output
             y_hat = sigmoid(w.T, X[example])
             if L2_Regularization:
-                l2_reg = .5 * LAMBDA * np.linalg.norm(w, 2)
+                l2_reg = LAMBDA * w  # = d/dw(.5*lambda*||w^2||)
 
             if y_hat >= .5:
                 y_hat = 1
-            # y_hat[y_hat >= .5] = 1  # Replace all values greater than .5 with 1
-            # print("y_hat : ", y_hat)
             loss = y_hat - Y[example]
             if loss[0] == 0:
                 correct_count += 1
                 print(correct_count)
             grad += loss[0] * X[example] + l2_reg
 
-
         w += -LEARNING_RATE * grad
-        # example_accuracy.append(np.sum(param_accuracy))
+
         step += 1
         example_accuracy.append(np.float(correct_count / example_count))
         correct_count = 0
 
 
     print(" Accuracy per Epoch: ", example_accuracy)
-    #
-    # print("Total Accuracy: ", total_accuracy)
-    # print("correct count: ", correct_count)
+
     return w, example_accuracy
 
 def main():

@@ -2,7 +2,7 @@
 Created on April 8th, 2018
 author: Julian Weisbord
 sources:
-description:
+description: Apply linear regression
 '''
 
 import random
@@ -15,10 +15,19 @@ D_FEATURES = [2, 4, 6, 8, 10]
 PLOT = False
 
 def calculate_weight(dataset, add_column=True, num_new_features=None, std_norm_vals=None):
+    '''
+    Description: Calculate weights using Linear Regression
+    Input: add_column <Boolean> Add a bias column if True
+           num_new_features <int> Number of random features to add
+               to input data
+    Return: w <numpy matrix> weight matrix
+            X <numpy matrix> usps data with different features
+            Y <numpy matrix> label for each data example
+            row_count <float64> number of rows in data set
+    '''
     X = []
     Y = []
     num_columns = 13  # Keep track of number of columns to insert more
-    # print("X: ", X)
     with open(dataset, 'r') as data:
         # Everything must be float64's or there are weird issues resulting in infinity
         row_count = np.float64(0.0)
@@ -44,12 +53,8 @@ def calculate_weight(dataset, add_column=True, num_new_features=None, std_norm_v
             row_count += np.float64(1.0)
         X = np.array(X, dtype=np.float64)
         Y = np.array(Y, dtype=np.float64)
-        # print(X[0:4])
-        # print(len(X))
-        # print("Y: ", Y[0])
 
         X_t = np.transpose(X)
-        #print("X_t[0]:", X_t)
 
         X_t_X = np.matmul(X_t, X)
         if num_new_features:
@@ -63,20 +68,20 @@ def calculate_weight(dataset, add_column=True, num_new_features=None, std_norm_v
             row[np.isnan(row)] = 0
             row[np.isinf(row)] = 0
 
-        # if num_new_features:
-        #     print("inv_eigen_X:", inv_eigen_X)
-        #     print("-----------------")
-        # print("inv_eigen_X: ", inv_eigen_X)
-        # print("inverse eigenvalues of X: ", inv_eigen_X, "shape: ", inv_eigen_X.shape)
 
         w = np.matmul(inv_eigen_X, np.matmul(X_t, Y))
-        # if num_new_features:
-        #     print("w: ", w)
-
-        # print("w: ", w)
         return w, X, Y, row_count
 
 def calculate_ase(w, X, Y, num_examples):
+    '''
+    Description: Calculate weights using Linear Regression
+    Input: num_examples <int> Total amount of usps data
+           to input data
+            w <numpy matrix> weight matrix
+            X <numpy matrix> usps data with different features
+            Y <numpy matrix> label for each data example
+    Return: Average Square Error
+    '''
     ase_c1 = np.transpose(np.subtract(Y, np.matmul(X, w)))
     ase_c2 = np.subtract(Y, np.matmul(X, w))
     print("ase_c1 ", ase_c1)
