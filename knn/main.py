@@ -1,6 +1,6 @@
 
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import knn
 from dec_tree import DecTree
 
@@ -71,9 +71,9 @@ def main():
     # Create Decision Stump:
     # train = np.genfromtxt("knn_data/knn_train.csv", delimiter=",")
     # print("new train", train)
-    stump = DecTree(train_normal, test_normal, 1, depth_limit=1, stump=True)
-    for d in D:
-        tree = DecTree(train_normal, test_normal, 10, d)
+    # stump = DecTree(train_normal, test_normal, 1, depth_limit=1, stump=True)
+    # for d in D:
+    #     tree = DecTree(train_normal, test_normal, 10, d)
 
 
 if __name__ == "__main__":
