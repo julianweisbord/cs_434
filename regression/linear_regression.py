@@ -61,7 +61,8 @@ def calculate_weight(dataset, add_column=True, num_new_features=None, std_norm_v
             print("X_t_X", X_t_X)
             print("-----------------")
 
-        inv_eigen_X = np.divide(np.float64(1.0), X_t_X, where=X_t_X!=0.0)
+        # inv_eigen_X = np.divide(np.float64(1.0), X_t_X, where=X_t_X!=0.0)
+        inv_eigen_X = np.linalg.inv(X_t_X)
         # Above statement doesn't catch all divide by zero errors some of
             # these result in nan or infinity and should be made zero
         for row in inv_eigen_X:
@@ -70,7 +71,10 @@ def calculate_weight(dataset, add_column=True, num_new_features=None, std_norm_v
 
 
         w = np.matmul(inv_eigen_X, np.matmul(X_t, Y))
-        return w, X, Y, row_count
+        if dataset == "./housing_train.txt":
+            return w, X, Y, row_count
+        else:
+            return X, Y, row_count
 
 def calculate_ase(w, X, Y, num_examples):
     '''
@@ -103,85 +107,85 @@ def main():
         # Feel free to use existing numerical packages to perform the computation.
         # Report the learned weight vector.
 
-    w_train, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA)
-    print("w_train_1: ", w_train)
-    w_test, X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA)
-    print("w_test_1: ", w_test)
+    w, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA)
+    print("w_1: ", w)
+    X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA)
+
     # Q2 Apply the learned weight vector to the training data and testing data respectively
         # and compute for each case the average squared error(ASE),
         # which is the SSE normalized by the total number of examples in the data.
         # Report the training and testing ASEs.
 
-    train_ase = calculate_ase(w_train, X_train, Y_train, num_examples_train)
-    test_ase = calculate_ase(w_test, X_test, Y_test, num_examples_test)
+    train_ase = calculate_ase(w, X_train, Y_train, num_examples_train)
+    test_ase = calculate_ase(w, X_test, Y_test, num_examples_test)
     print("train_ase_Q2: ", train_ase)
     print("test_ase_Q2: ", test_ase)
 
-    #Q3 Remove the dummy variable (the column of ones) from X, repeat 1 and 2.
-        # How does this change influence the ASE on the training and testing data?
-        # Provide an explanation for this influence.
+    # #Q3 Remove the dummy variable (the column of ones) from X, repeat 1 and 2.
+    #     # How does this change influence the ASE on the training and testing data?
+    #     # Provide an explanation for this influence.
+    #
+    w, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA, add_column=False)
+    X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA, add_column=False)
 
-    w_train, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA, add_column=False)
-    w_test, X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA, add_column=False)
-
-    train_ase = calculate_ase(w_train, X_train, Y_train, num_examples_train)
-    test_ase = calculate_ase(w_test, X_test, Y_test, num_examples_test)
+    train_ase = calculate_ase(w, X_train, Y_train, num_examples_train)
+    test_ase = calculate_ase(w, X_test, Y_test, num_examples_test)
     print("train_ase w/out column of 1's: ", train_ase)
     print("test_ase w/out column of 1's: ", test_ase)
-
-    # Q4 Modify the data by adding additional random features. You will do this to both
-        # training and testing data. In particular, for each instance, generate d (consider d = 2, 4, 6, ...10,
-        # feel free to explore more values) random features, by sampling from a standard normal distribution.
-        # For each d value, apply linear regression to find the optimal weight vector and compute its
-        # resulting training and testing ASEs. Plot the training and testing ASEs as a function of d.
-        # What trends do you observe for training data and test data respectively?
-        # Do more features lead to better prediction performance at testing stage?
-        # Provide an explanation to your observations.
-    ase_train_scores = []
-    ase_test_scores = []
-
-    for num_new_features in D_FEATURES:
-        # std_norm_val = 1
-        std_norm_vals = []
-        for num in range(num_new_features):
-            std_norm_vals.append(np.float64(num))
-            std_norm_vals.append(np.float64(-num))
-            # std_norm_val += 1
-
-
-        w_train, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA,
-                                                                         add_column=True,
-                                                                         num_new_features=num_new_features,
-                                                                         std_norm_vals=std_norm_vals)
-
-        w_test, X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA,
-                                                                     add_column=True,
-                                                                     num_new_features=num_new_features,
-                                                                     std_norm_vals=std_norm_vals)
-        print("w_train: ", w_train)
-        print("w_test: ", w_test)
-        train_ase = calculate_ase(w_train, X_train, Y_train, num_examples_train)
-        test_ase = calculate_ase(w_test, X_test, Y_test, num_examples_test)
-
-        ase_train_scores.append(train_ase)
-        ase_test_scores.append(test_ase)
-
-        print("train_ase:", train_ase)
-        print("test_ase:", test_ase)
-
-    print("ase_train_scores: ", ase_train_scores)
-    print("ase_test_scores: ", ase_test_scores)
-    # Plot ase's as a function of d
-    if PLOT:
-        plt.plot(D_FEATURES, ase_train_scores)
-        plt.xlabel('D Values')
-        plt.ylabel('Train Average Squared Error')
-        plt.show()
-
-        plt.plot(D_FEATURES, ase_test_scores)
-        plt.xlabel('D Values')
-        plt.ylabel('Test Average Squared Error')
-        plt.show()
+    #
+    # # Q4 Modify the data by adding additional random features. You will do this to both
+    #     # training and testing data. In particular, for each instance, generate d (consider d = 2, 4, 6, ...10,
+    #     # feel free to explore more values) random features, by sampling from a standard normal distribution.
+    #     # For each d value, apply linear regression to find the optimal weight vector and compute its
+    #     # resulting training and testing ASEs. Plot the training and testing ASEs as a function of d.
+    #     # What trends do you observe for training data and test data respectively?
+    #     # Do more features lead to better prediction performance at testing stage?
+    #     # Provide an explanation to your observations.
+    # ase_train_scores = []
+    # ase_test_scores = []
+    #
+    # for num_new_features in D_FEATURES:
+    #     # std_norm_val = 1
+    #     std_norm_vals = []
+    #     for num in range(num_new_features):
+    #         std_norm_vals.append(np.float64(num))
+    #         std_norm_vals.append(np.float64(-num))
+    #         # std_norm_val += 1
+    #
+    #
+    #     w, X_train, Y_train, num_examples_train = calculate_weight(TRAIN_DATA,
+    #                                                                      add_column=True,
+    #                                                                      num_new_features=num_new_features,
+    #                                                                      std_norm_vals=std_norm_vals)
+    #
+    #     X_test, Y_test, num_examples_test = calculate_weight(TEST_DATA,
+    #                                                                  add_column=True,
+    #                                                                  num_new_features=num_new_features,
+    #                                                                  std_norm_vals=std_norm_vals)
+    #     print("w: ", w)
+    #
+    #     train_ase = calculate_ase(w, X_train, Y_train, num_examples_train)
+    #     test_ase = calculate_ase(w, X_test, Y_test, num_examples_test)
+    #
+    #     ase_train_scores.append(train_ase)
+    #     ase_test_scores.append(test_ase)
+    #
+    #     print("train_ase:", train_ase)
+    #     print("test_ase:", test_ase)
+    #
+    # print("ase_train_scores: ", ase_train_scores)
+    # print("ase_test_scores: ", ase_test_scores)
+    # # Plot ase's as a function of d
+    # if PLOT:
+    #     plt.plot(D_FEATURES, ase_train_scores)
+    #     plt.xlabel('D Values')
+    #     plt.ylabel('Train Average Squared Error')
+    #     plt.show()
+    #
+    #     plt.plot(D_FEATURES, ase_test_scores)
+    #     plt.xlabel('D Values')
+    #     plt.ylabel('Test Average Squared Error')
+    #     plt.show()
 
 if __name__ == "__main__":
     main()
